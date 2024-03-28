@@ -39,18 +39,22 @@ const recordSlice = createSlice({
   initialState,
   reducers: {
     createRecords: (state, action) => {
-        action.payload.id = nanoid()
-      state.data.push(action.payload);
+      
+        action.payload.id = nanoid();
+        state.data.push(action.payload);
+      
     },
-    getRecords: (state) => {},
-    updateRecords: (state) => {},
+    updateRecords: (state, action) => {
+      const index = state.data.findIndex((el) => el.id == action.payload.id);
+      if (index > -1) state.data[index] = action.payload;
+    },
     deleteRecords: (state, action) => {
-        state.data = state.data.filter(el => el.id != action.payload)
+      state.data = state.data.filter((el) => el.id != action.payload);
     },
   },
 });
 
-export const { createRecords, getRecords, updateRecords, deleteRecords } =
+export const { createRecords, updateRecords, deleteRecords } =
   recordSlice.actions;
 
 export default recordSlice.reducer;

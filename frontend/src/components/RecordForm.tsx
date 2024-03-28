@@ -32,6 +32,7 @@ const RecordForm: FC = () => {
       ttl: "",
     });
   };
+  
   const dispatch = useDispatch();
 
   const handleFormSubmit: FormEventHandler<HTMLFormElement> = (e) => {

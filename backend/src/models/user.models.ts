@@ -9,7 +9,6 @@ const userSchema = new Schema(
             type: String,
             required: [true, "user name is required"],
             trim: true,
-            lowercase: true,
             index: true,
         },
         
@@ -48,6 +47,8 @@ userSchema.methods.isPasswordCorrect = async function(password: string){
 
 // -------------generate access token method or middleware----------------
 userSchema.methods.generateAccessToken = function() {
+    console.log(process.env.ACCESS_TOKEN_SECRET);
+    
     return jwt.sign(
         {
             _id: this._id,
@@ -55,9 +56,9 @@ userSchema.methods.generateAccessToken = function() {
             username: this.username,
             fullName: this.fullName
         },
-        process.env.ACCESS_TOKEN_SECRET || "SECRET",
+        process.env.ACCESS_TOKEN_SECRET as any,
         {
-            expiresIn: process.env.ACCESS_TOKEN_EXPIRY
+            expiresIn: process.env.ACCESS_TOKEN_EXPERY
         }
     )
 }
@@ -67,11 +68,10 @@ userSchema.methods.generateRefreshToken = function(){
     return jwt.sign(
         {
             _id: this._id,
-            
         },
-        process.env.REFRESH_TOKEN_SECRET || "SECRET",
+        process.env.REFRESH_TOKEN_SECRET as any,
         {
-            expiresIn: process.env.REFRESH_TOKEN_EXPIRY
+            expiresIn: process.env.REFRESH_TOKEN_EXPERY
         }
     )
 }

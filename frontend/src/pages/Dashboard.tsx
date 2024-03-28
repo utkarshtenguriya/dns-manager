@@ -1,22 +1,146 @@
-import { FC } from "react";
+import { ChangeEventHandler, FC, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Store } from "../@types";
 import { LiaEditSolid } from "react-icons/lia";
 import { AiOutlineDelete } from "react-icons/ai";
-import RecordForm from "../components/RecordForm";
 import { BiSearch } from "react-icons/bi";
-import { deleteRecords } from "../app/slices/recordSlice";
+import { createRecords, deleteRecords, updateRecords } from "../app/slices/recordSlice";
 
 const Dashboard: FC = () => {
   const data = useSelector((state: Store) => state.records.data);
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
 
+  const [input, setInput] = useState<{
+    id?: string;
+    type: string;
+    name: string;
+    ip: string;
+    ttl: string;
+  }>({
+    id: "",
+    type: "",
+    name: "",
+    ip: "",
+    ttl: "",
+  });
 
+  const handleInputChanged: ChangeEventHandler<HTMLInputElement> = ({
+    target: { name, value },
+  }) => {
+    setInput({ ...input, [name]: value });
+    console.log(input);
+  };
+
+  const handleClearInput = () => {
+    setInput({
+      type: "",
+      name: "",
+      ip: "",
+      ttl: "",
+    });
+  };
+
+  const handleUpdateRecord = () => {
+    dispatch(updateRecords(input))
+    setInput(
+      {
+        type: "",
+        name: "",
+        ip: "",
+        ttl: "",
+      }
+    )
+  }
+
+  const handleCreateRecord = () => {
+      dispatch(createRecords(input))
+      setInput(
+        {
+          id: "",
+          type: "",
+          name: "",
+          ip: "",
+          ttl: "",
+        }
+      )
+    
+  }
 
   return (
     <div>
       <div>
-        <RecordForm />
+        <div className="mt-14 mb-10">
+          <div>
+            <div className="w-[80%] mx-auto grid grid-cols-4 py-4 px-4 shadow-sm border-2 border-slate-300 rounded-md">
+              <div className="flex space-x-3">
+                <label htmlFor="type" className="font-semibold">
+                  Type:
+                </label>
+                <input
+                  type="text"
+                  className="border-2 border-slate-400 focus:outline-2 focus:outline-blue-600 rounded-md py-[1px] px-2 w-[60%]"
+                  name="type"
+                  onChange={handleInputChanged}
+                  value={input.type}
+                />
+              </div>
+              <div className="flex space-x-3">
+                <label htmlFor="type" className="font-semibold">
+                  Name:
+                </label>
+                <input
+                  type="text"
+                  className="border-2 border-slate-400 focus:outline-2 focus:outline-blue-600 rounded-md py-[1px] px-2 w-[60%]"
+                  name="name"
+                  onChange={handleInputChanged}
+                  value={input.name}
+                />
+              </div>
+              <div className="flex space-x-3">
+                <label htmlFor="type" className="font-semibold">
+                  IP:
+                </label>
+                <input
+                  type="text"
+                  className="border-2 border-slate-400 focus:outline-2 focus:outline-blue-600 rounded-md py-[1px] px-2 w-[60%]"
+                  name="ip"
+                  onChange={handleInputChanged}
+                  value={input.ip}
+                />
+              </div>
+              <div className="flex space-x-3">
+                <label htmlFor="type" className="font-semibold">
+                  TTL:
+                </label>
+                <input
+                  type="text"
+                  className="border-2 border-slate-400 focus:outline-2 focus:outline-blue-600 rounded-md py-[1px] px-2 w-[60%]"
+                  name="ttl"
+                  onChange={handleInputChanged}
+                  value={input.ttl}
+                />
+              </div>
+              <div className="flex">
+                <button className="py-[2px] px-6 bg-blue-500 font-semibold text-white rounded-md mt-5 ml-2"
+                onClick={handleCreateRecord}
+                >
+                  Add
+                </button>
+                <button className="py-[2px] px-6 bg-green-600 font-semibold text-white rounded-md mt-5 ml-6"
+                onClick={handleUpdateRecord}
+                >
+                  Update
+                </button>
+                <button
+                  className="py-[2px] px-6 bg-red-500 font-semibold text-white rounded-md mt-5 ml-6"
+                  onClick={handleClearInput}
+                >
+                  Clear
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
         <div className="flex justify-center my-2">
           <div className="my-2 flex space-x-4 w-[80%]">
             <input
@@ -63,9 +187,17 @@ const Dashboard: FC = () => {
                   <td className="py-2 px-4">{el.ip}</td>
                   <td className="py-2 px-4">{el.ttl}</td>
                   <td className="py-2 px-4 flex justify-evenly">
-                    <LiaEditSolid className="bg-slate-600 text-white text-2xl py-1 px-2 rounded-md w-10 hover:cursor-pointer" />
-                    <AiOutlineDelete className="bg-red-500 text-white text-2xl py-1 px-2 rounded-md w-10 hover:cursor-pointer" 
-                    onClick={() => dispatch(deleteRecords(el.id))}
+                    <LiaEditSolid
+                      className="bg-slate-600 text-white text-2xl py-1 px-2 rounded-md w-10 hover:cursor-pointer"
+                      onClick={() => {
+                        setInput(el);
+                        console.log(el);
+                        
+                      }}
+                    />
+                    <AiOutlineDelete
+                      className="bg-red-500 text-white text-2xl py-1 px-2 rounded-md w-10 hover:cursor-pointer"
+                      onClick={() => dispatch(deleteRecords(el.id))}
                     />
                   </td>
                 </tr>
