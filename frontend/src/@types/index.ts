@@ -14,5 +14,5 @@ export interface ModalConstI {
 }
 
 export interface RecordsInfr {
-  data: [{ readonly id?: string; type: string; name: string; ip: string; ttl: string }];
+  data: [{ id: string; Type: string; Name: string; ResourceRecords: [{}] | null; TTL: number }];
 }

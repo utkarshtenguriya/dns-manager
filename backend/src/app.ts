@@ -8,7 +8,7 @@ const app: Application = express();
  * Configuration for cross origin requests 
  */
 const options: CorsOptions = {
-    origin: process.env.CORS_ORIGIN || "*",
+    origin: process.env.CORS_ORIGIN as string,
     credentials: true,
 };
 
@@ -21,8 +21,10 @@ app.use(cookieParser());
  
 // Routes imported 
 import userRouter from "./routes/user.routes"
+import recordRouter from "./routes/record.routes";
 
 // Define routes
 app.use("/api/v1/user", userRouter)
+app.use("/api/v1/record", recordRouter)
 
 export { app };

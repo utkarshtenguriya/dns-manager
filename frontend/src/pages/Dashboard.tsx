@@ -1,10 +1,14 @@
-import { ChangeEventHandler, FC, useState } from "react";
+import { ChangeEventHandler, FC, Fragment, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Store } from "../@types";
 import { LiaEditSolid } from "react-icons/lia";
 import { AiOutlineDelete } from "react-icons/ai";
 import { BiSearch } from "react-icons/bi";
-import { createRecords, deleteRecords, updateRecords } from "../app/slices/recordSlice";
+import { createRecords, deleteRecords, refreshRecords, updateRecords } from "../app/slices/recordSlice";
+import { useFetchRecords } from "../hooks/fetchRecords";
+import axios from "axios";
+
+
 
 const Dashboard: FC = () => {
   const data = useSelector((state: Store) => state.records.data);
@@ -12,31 +16,57 @@ const Dashboard: FC = () => {
 
   const [input, setInput] = useState<{
     id?: string;
-    type: string;
-    name: string;
-    ip: string;
-    ttl: string;
+    Type: string;
+    Name: string;
+    ResourceRecords: [any] | null;
+    TTL: number;
   }>({
     id: "",
-    type: "",
-    name: "",
-    ip: "",
-    ttl: "",
+    Type: "",
+    Name: "",
+    ResourceRecords: null,
+    TTL: -1,
   });
+
+
+  useEffect(() => {
+    
+
+    const fetchDataHandler = async () => {
+      const response = await axios.post("/api/v1/record/fetch", {hosted_zone_id: "Z07606197CFJOFVEV7H2"}).then(res => res.data)
+
+      const {data} = response
+      
+      dispatch(refreshRecords(data))
+
+      console.log(data[0]);
+      
+    }
+
+    // console.log(fetchDataHandler());
+    
+    fetchDataHandler()
+  }, [])
+
+
 
   const handleInputChanged: ChangeEventHandler<HTMLInputElement> = ({
     target: { name, value },
   }) => {
-    setInput({ ...input, [name]: value });
+    if (name == "ResourceRecords") {
+      setInput({ ...input, [name as string]: value.split(",") });
+    } else {
+      setInput({ ...input, [name]: value });
+    }
     console.log(input);
   };
 
   const handleClearInput = () => {
     setInput({
-      type: "",
-      name: "",
-      ip: "",
-      ttl: "",
+      Type: "",
+      Name: "",
+      ResourceRecords: null,
+      TTL: -1,
     });
   };
 
@@ -44,23 +74,32 @@ const Dashboard: FC = () => {
     dispatch(updateRecords(input))
     setInput(
       {
-        type: "",
-        name: "",
-        ip: "",
-        ttl: "",
+        Type: "",
+        Name: "",
+        ResourceRecords: null,
+        TTL: -1,
       }
     )
   }
 
-  const handleCreateRecord = () => {
-      dispatch(createRecords(input))
+  const handleCreateRecord = async () => {
+
+    const resources: any = input.ResourceRecords?.map(el => ({Value: el}))
+    setInput({...input, ResourceRecords: resources})
+
+    const response: any = axios.post("/api/v1/record/create", input).then(res => res.data)
+
+    if (response.success) {
+      dispatch(refreshRecords(response.data))
+    }
+
       setInput(
         {
           id: "",
-          type: "",
-          name: "",
-          ip: "",
-          ttl: "",
+          Type: "",
+          Name: "",
+          ResourceRecords: null,
+          TTL: -1,
         }
       )
     
@@ -79,9 +118,9 @@ const Dashboard: FC = () => {
                 <input
                   type="text"
                   className="border-2 border-slate-400 focus:outline-2 focus:outline-blue-600 rounded-md py-[1px] px-2 w-[60%]"
-                  name="type"
+                  name="Type"
                   onChange={handleInputChanged}
-                  value={input.type}
+                  value={input.Type}
                 />
               </div>
               <div className="flex space-x-3">
@@ -91,9 +130,9 @@ const Dashboard: FC = () => {
                 <input
                   type="text"
                   className="border-2 border-slate-400 focus:outline-2 focus:outline-blue-600 rounded-md py-[1px] px-2 w-[60%]"
-                  name="name"
+                  name="Name"
                   onChange={handleInputChanged}
-                  value={input.name}
+                  value={input.Name}
                 />
               </div>
               <div className="flex space-x-3">
@@ -103,9 +142,9 @@ const Dashboard: FC = () => {
                 <input
                   type="text"
                   className="border-2 border-slate-400 focus:outline-2 focus:outline-blue-600 rounded-md py-[1px] px-2 w-[60%]"
-                  name="ip"
+                  name="ResourceRecords"
                   onChange={handleInputChanged}
-                  value={input.ip}
+                  value={input.ResourceRecords|| ""}
                 />
               </div>
               <div className="flex space-x-3">
@@ -115,9 +154,9 @@ const Dashboard: FC = () => {
                 <input
                   type="text"
                   className="border-2 border-slate-400 focus:outline-2 focus:outline-blue-600 rounded-md py-[1px] px-2 w-[60%]"
-                  name="ttl"
+                  name="TTL"
                   onChange={handleInputChanged}
-                  value={input.ttl}
+                  value={input.TTL}
                 />
               </div>
               <div className="flex">
@@ -156,7 +195,7 @@ const Dashboard: FC = () => {
       </div>
       <div>
         <div className="flex justify-center">
-          <table className="w-[80%] mt-2 table-auto ">
+          <table className="w-[80%] mt-2 h-[256px] mb-24">
             <thead className=" bg-blue-500 text-white text-left">
               <tr className="space-x-24">
                 <th className="py-2 px-4 cursor-pointer hover:bg-blue-600">
@@ -165,8 +204,8 @@ const Dashboard: FC = () => {
                 <th className="py-2 px-4 cursor-pointer hover:bg-blue-600">
                   Name
                 </th>
-                <th className="py-2 px-4 cursor-pointer hover:bg-blue-600">
-                  IP Address
+                <th className="py-2 px-4 cursor-pointer hover:bg-blue-600 w-[40%]">
+                  ResourceRecords
                 </th>
                 <th className="py-2 px-4 cursor-pointer hover:bg-blue-600">
                   TTL
@@ -182,15 +221,15 @@ const Dashboard: FC = () => {
                   className="even:bg-slate-200 odd:bg-slate-100 hover:bg-slate-300"
                   key={el.id}
                 >
-                  <td className="py-2 px-4">{el.type}</td>
-                  <td className="py-2 px-4">{el.name}</td>
-                  <td className="py-2 px-4">{el.ip}</td>
-                  <td className="py-2 px-4">{el.ttl}</td>
-                  <td className="py-2 px-4 flex justify-evenly">
+                  <td className="py-2 px-4">{el.Type}</td>
+                  <td className="py-2 px-4">{el.Name}</td>
+                  <td className="py-2 px-4">{el.ResourceRecords?.map((el: any, id) => <Fragment key={id}>{el.Value}<br/></Fragment>)}</td>
+                  <td className="py-2 px-4">{el.TTL}</td>
+                  <td className="py-2 px-4 flex justify-evenly items-center">
                     <LiaEditSolid
                       className="bg-slate-600 text-white text-2xl py-1 px-2 rounded-md w-10 hover:cursor-pointer"
                       onClick={() => {
-                        setInput(el);
+                        setInput(el as any);
                         console.log(el);
                         
                       }}

@@ -1,7 +1,6 @@
-import mongoose from "mongoose";
-import { Types, mongo } from "mongoose";
+import { Types } from "mongoose";
 
-export interface UserInfer {
+export interface UserBody {
     _id: Types.ObjectId;
     username: string;
     email: string;
@@ -10,7 +9,7 @@ export interface UserInfer {
 
 export interface ApiResponseInfer {
     statusCode: number;
-    data: Object;
+    payload: Object;
     message: string;
     success: boolean;
 }
@@ -24,7 +23,7 @@ export interface ApiErrorInfer {
     stack?: string;
 }
 
-export interface loginInfer {
+export interface LogInBody {
     email: string;
     password: string;
 }
@@ -33,4 +32,17 @@ export interface tokenPayloadInfer {
     _id: Types.ObjectId;
     userName?: string;
     email?: string;
+}
+
+export interface RecordBody {
+    Name: string;
+    Type: string;
+    TTL: number;
+    ResourceRecords: [any];
+    hosted_zone_id: string
+}
+
+export interface TypedRequest<T> {
+    body: T;
+    files?: File // optional:: for setting avater purpose
 }

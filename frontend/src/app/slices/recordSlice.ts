@@ -1,37 +1,16 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { nanoid } from "nanoid";
+import { RecordsInfr } from "../../@types";
 
-const initialState = {
+const initialState: RecordsInfr = {
   data: [
     {
-      id: nanoid(),
-      type: "TXT",
-      name: "www.example.com",
-      ip: "192.0.1.16",
-      ttl: "auto",
-    },
-    {
-      id: nanoid(),
-      type: "A",
-      name: "www.google.com",
-      ip: "192.0.0.0",
-      ttl: "auto",
-    },
-    {
-      id: nanoid(),
-      type: "AAA",
-      name: "www.Yahoo.com",
-      ip: "192.34.50.10",
-      ttl: "auto",
-    },
-    {
-      id: nanoid(),
-      type: "CNAME",
-      name: "www.amazon.com",
-      ip: "192.2.9.0",
-      ttl: "auto",
-    },
-  ],
+    id: nanoid(),
+    Name: "www.johndoe.com",
+    Type: "A",
+    ResourceRecords: [{Value: "125.0.03"}],
+    TTL: 300}
+  ]
 };
 
 const recordSlice = createSlice({
@@ -45,16 +24,23 @@ const recordSlice = createSlice({
       
     },
     updateRecords: (state, action) => {
-      const index = state.data.findIndex((el) => el.id == action.payload.id);
+      const index = state.data.findIndex((el: any) => el.id == action.payload.id);
       if (index > -1) state.data[index] = action.payload;
     },
-    deleteRecords: (state, action) => {
-      state.data = state.data.filter((el) => el.id != action.payload);
+    deleteRecords: (state: any, action) => {
+      state.data = state.data.filter((el: any) => el.id != action.payload);
     },
+    refreshRecords: (state, action) => {
+      state.data = action.payload.map((el: any) => {
+        el.id = nanoid()
+        return el
+      })
+      state.data = action.payload
+    }
   },
 });
 
-export const { createRecords, updateRecords, deleteRecords } =
+export const { createRecords, updateRecords, deleteRecords, refreshRecords } =
   recordSlice.actions;
 
 export default recordSlice.reducer;

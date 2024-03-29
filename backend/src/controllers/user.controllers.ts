@@ -1,18 +1,11 @@
 import { Request, Response, NextFunction } from "express";
 import { asyncHandler } from "../utils/asyncHandler";
-import { UserInfer, loginInfer, tokenPayloadInfer } from "../@types";
+import { TypedRequest, UserBody, LogInBody } from "../@types";
 import { ApiError } from "../utils/ApiError";
 import { User } from "../models/user.models";
 import { ApiResponse } from "../utils/ApiResponse";
-// import { generateToken } from "../utils/generateToken";
-import bcrypt from "bcryptjs";
 
 
-
-interface TypedRequest<T> extends Request {
-    body: T;
-    files: any;
-}
 
 const generateAccessAndRefereshTokens = async(userId: string) => {
     try {
@@ -32,7 +25,7 @@ const generateAccessAndRefereshTokens = async(userId: string) => {
 
 // -------------defined user register or signup controller------------------
 export const registerUser = asyncHandler(
-    async (req: TypedRequest<UserInfer>, res: Response, next: NextFunction) => {
+    async (req: TypedRequest<UserBody>, res: Response, next: NextFunction) => {
         // get user details from frontend
         const { username, email, password } = req.body;
 
@@ -84,7 +77,7 @@ export const registerUser = asyncHandler(
 
 // ---------Login controller------------
 export const loginUser = asyncHandler(
-    async (req: Request, res: Response) => {
+    async (req: TypedRequest<LogInBody>, res: Response) => {
         const {email, password} = req.body
 
         if (!email && !password) {

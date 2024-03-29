@@ -5,7 +5,7 @@ const router = Router();
 // Controllers imported
 import { loginUser, registerUser } from "../controllers/user.controllers";
 
-// API routes
+// -----------open routes------------ 
 router.route("/register").post(
     registerUser
 );

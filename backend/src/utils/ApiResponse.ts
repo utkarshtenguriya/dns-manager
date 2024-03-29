@@ -2,13 +2,13 @@ import { ApiResponseInfer } from "../@types";
 
 class ApiResponse implements ApiResponseInfer {
     statusCode: number;
-    data: Object;
+    payload: Object;
     message: string;
     success: boolean;
 
-    constructor(statusCode: number, data: Object, message = "Success") {
+    constructor(statusCode: number, payload: Object, message = "Success") {
         this.statusCode = statusCode;
-        this.data = data;
+        this.payload = payload;
         this.message = message;
         this.success = statusCode < 400;
     }
