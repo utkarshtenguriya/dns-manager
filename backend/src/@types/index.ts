@@ -39,7 +39,7 @@ export interface RecordBody {
     Type: string;
     TTL: number;
     ResourceRecords: [any];
-    hosted_zone_id: string
+    // hosted_zone_id: string
 }
 
 export interface TypedRequest<T> {

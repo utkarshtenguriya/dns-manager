@@ -13,6 +13,13 @@ export interface ModalConstI {
   SIGNUP: "SIGNUP";
 }
 
+export interface DataInstanceInfr {
+  id: string;
+  Type: string;
+  Name: string;
+  ResourceRecords: [{ Value: string }] | null;
+  TTL: number;
+}
 export interface RecordsInfr {
-  data: [{ id: string; Type: string; Name: string; ResourceRecords: [{}] | null; TTL: number }];
+  data: [DataInstanceInfr]
 }

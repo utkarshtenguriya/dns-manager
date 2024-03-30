@@ -1,116 +1,123 @@
 import { ChangeEventHandler, FC, Fragment, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Store } from "../@types";
+import { DataInstanceInfr, RecordsInfr, Store } from "../@types";
 import { LiaEditSolid } from "react-icons/lia";
 import { AiOutlineDelete } from "react-icons/ai";
 import { BiSearch } from "react-icons/bi";
-import { createRecords, deleteRecords, refreshRecords, updateRecords } from "../app/slices/recordSlice";
-import { useFetchRecords } from "../hooks/fetchRecords";
+import {
+  updateRecords,
+} from "../app/slices/recordSlice";
 import axios from "axios";
-
-
+import RecordForm from "../components/RecordForm";
+import { nanoid } from "nanoid";
 
 const Dashboard: FC = () => {
-  const data = useSelector((state: Store) => state.records.data);
+  // const data: [DataInstanceInfr] = useSelector((state: Store) => state.records.data);
   const dispatch = useDispatch();
+  const [table, setTable] = useState<[DataInstanceInfr]>()
 
   const [input, setInput] = useState<{
     id?: string;
     Type: string;
     Name: string;
-    ResourceRecords: [any] | null;
+    ResourceRecords: [{Value: string}] | null;
     TTL: number;
   }>({
     id: "",
     Type: "",
     Name: "",
     ResourceRecords: null,
-    TTL: -1,
+    TTL: 0,
   });
 
-
   useEffect(() => {
-    
-
     const fetchDataHandler = async () => {
-      const response = await axios.post("/api/v1/record/fetch", {hosted_zone_id: "Z07606197CFJOFVEV7H2"}).then(res => res.data)
+      const response = await axios
+        .post("/api/v1/record/fetch")
+        .then((res) => res.data);
 
-      const {data} = response
-      
-      dispatch(refreshRecords(data))
+      const payload: [DataInstanceInfr] = response.payload
 
-      console.log(data[0]);
-      
-    }
+      console.log(payload);
 
-    // console.log(fetchDataHandler());
-    
+      const d = payload.map(el => {
+        el.id = nanoid()
+        return el;
+      })
+
+      setTable(d as any)
+      // dispatch(refreshRecords(payload))
+    };
+
     fetchDataHandler()
-  }, [])
-
-
+    
+  },[]);
 
   const handleInputChanged: ChangeEventHandler<HTMLInputElement> = ({
     target: { name, value },
   }) => {
     if (name == "ResourceRecords") {
-      setInput({ ...input, [name as string]: value.split(",") });
+      setInput({ ...input, [name as string]: value.split(",").map((el: any) => ({Value: el})) });
     } else {
       setInput({ ...input, [name]: value });
     }
     console.log(input);
   };
 
-  const handleClearInput = () => {
+  const clearInputFields = () => {
     setInput({
       Type: "",
       Name: "",
       ResourceRecords: null,
-      TTL: -1,
+      TTL: 0,
     });
   };
 
-  const handleUpdateRecord = () => {
-    dispatch(updateRecords(input))
-    setInput(
-      {
-        Type: "",
-        Name: "",
-        ResourceRecords: null,
-        TTL: -1,
-      }
-    )
-  }
 
   const handleCreateRecord = async () => {
+    clearInputFields()
 
-    const resources: any = input.ResourceRecords?.map(el => ({Value: el}))
-    setInput({...input, ResourceRecords: resources})
+    const response: any = await axios
+      .post("/api/v1/record/create", input)
+      .then((res) => res.data);
+      
 
-    const response: any = axios.post("/api/v1/record/create", input).then(res => res.data)
-
-    if (response.success) {
-      dispatch(refreshRecords(response.data))
+    if (!response.success) {
+      throw new Error("Something went wrong!!!")
     }
-
-      setInput(
-        {
-          id: "",
-          Type: "",
-          Name: "",
-          ResourceRecords: null,
-          TTL: -1,
-        }
-      )
     
+    console.log(response.payload);
+    
+    const data = response.payload.data.map((el: any) => {
+      el.id = nanoid()
+      return el
+    })
+    setTable(data)
+  };
+
+
+  const handleDeleteRecord = async (element: DataInstanceInfr) => {
+    const response = await axios.post("/api/v1/record/delete", element).then(res => res.data)
+
+    const data = response.payload.map((el: any) => {
+      el.id = nanoid()
+      return el
+    })
+
+    setTable(data)
   }
+
+  const handleUpdateRecord = () => {
+    
+  };
+
 
   return (
     <div>
       <div>
         <div className="mt-14 mb-10">
           <div>
-            <div className="w-[80%] mx-auto grid grid-cols-4 py-4 px-4 shadow-sm border-2 border-slate-300 rounded-md">
+            <div className="w-[80%] table-auto mx-auto grid grid-cols-4 py-4 px-4 shadow-sm border-2 border-slate-300 rounded-md">
               <div className="flex space-x-3">
                 <label htmlFor="type" className="font-semibold">
                   Type:
@@ -137,14 +144,14 @@ const Dashboard: FC = () => {
               </div>
               <div className="flex space-x-3">
                 <label htmlFor="type" className="font-semibold">
-                  IP:
+                  Resources:
                 </label>
                 <input
                   type="text"
                   className="border-2 border-slate-400 focus:outline-2 focus:outline-blue-600 rounded-md py-[1px] px-2 w-[60%]"
                   name="ResourceRecords"
                   onChange={handleInputChanged}
-                  value={input.ResourceRecords|| ""}
+                  value={input.ResourceRecords?.map(el => el.Value) || ""}
                 />
               </div>
               <div className="flex space-x-3">
@@ -160,19 +167,21 @@ const Dashboard: FC = () => {
                 />
               </div>
               <div className="flex">
-                <button className="py-[2px] px-6 bg-blue-500 font-semibold text-white rounded-md mt-5 ml-2"
-                onClick={handleCreateRecord}
+                <button
+                  className="py-[2px] px-6 bg-blue-500 font-semibold text-white rounded-md mt-5 ml-2"
+                  onClick={handleCreateRecord}
                 >
                   Add
                 </button>
-                <button className="py-[2px] px-6 bg-green-600 font-semibold text-white rounded-md mt-5 ml-6"
-                onClick={handleUpdateRecord}
+                <button
+                  className="py-[2px] px-6 bg-green-600 font-semibold text-white rounded-md mt-5 ml-6"
+                  onClick={handleUpdateRecord}
                 >
                   Update
                 </button>
                 <button
                   className="py-[2px] px-6 bg-red-500 font-semibold text-white rounded-md mt-5 ml-6"
-                  onClick={handleClearInput}
+                  onClick={clearInputFields}
                 >
                   Clear
                 </button>
@@ -216,14 +225,21 @@ const Dashboard: FC = () => {
               </tr>
             </thead>
             <tbody>
-              {data.map((el) => (
+              { table ? table?.map((el) => (
                 <tr
                   className="even:bg-slate-200 odd:bg-slate-100 hover:bg-slate-300"
                   key={el.id}
                 >
                   <td className="py-2 px-4">{el.Type}</td>
                   <td className="py-2 px-4">{el.Name}</td>
-                  <td className="py-2 px-4">{el.ResourceRecords?.map((el: any, id) => <Fragment key={id}>{el.Value}<br/></Fragment>)}</td>
+                  <td className="py-2 px-4">
+                    {el.ResourceRecords?.map((el: any, id) => (
+                      <Fragment key={id}>
+                        {el.Value}
+                        <br />
+                      </Fragment>
+                    ))}
+                  </td>
                   <td className="py-2 px-4">{el.TTL}</td>
                   <td className="py-2 px-4 flex justify-evenly items-center">
                     <LiaEditSolid
@@ -231,16 +247,19 @@ const Dashboard: FC = () => {
                       onClick={() => {
                         setInput(el as any);
                         console.log(el);
-                        
                       }}
                     />
                     <AiOutlineDelete
                       className="bg-red-500 text-white text-2xl py-1 px-2 rounded-md w-10 hover:cursor-pointer"
-                      onClick={() => dispatch(deleteRecords(el.id))}
+                      onClick={() => handleDeleteRecord(el)}
                     />
                   </td>
                 </tr>
-              ))}
+              )):
+                <tr>
+                  <td >Loading...</td >
+                </tr>
+            }
             </tbody>
           </table>
         </div>

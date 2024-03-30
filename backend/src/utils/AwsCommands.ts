@@ -20,8 +20,8 @@ export const generateSingleRecordFetchCommand = (hosted_zone_id: string, Name: s
 }
 
 
-export const generateCreateRecordCommand = (body: RecordBody) => {
-    const {Name, Type, TTL, ResourceRecords, hosted_zone_id} = body
+export const generateCreateRecordCommand = (body: RecordBody, hosted_zone_id: string) => {
+    const {Name, Type, TTL, ResourceRecords} = body
 
     const ChangeBatch: any = {
         Changes: [
@@ -44,8 +44,8 @@ export const generateCreateRecordCommand = (body: RecordBody) => {
 }
 
 
-export const generateDeleteRecordCommand = (body: RecordBody) => {
-    const {Name, Type, TTL, ResourceRecords, hosted_zone_id} = body
+export const generateDeleteRecordCommand = (body: RecordBody, hosted_zone_id: string) => {
+    const {Name, Type, TTL, ResourceRecords} = body
 
 
     const ChangeBatch: any = {
