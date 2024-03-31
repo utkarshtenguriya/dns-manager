@@ -6,9 +6,11 @@ export default defineConfig({
   plugins: [react()],
   server: {
     proxy: {
-        "/api/v1": {
-            target: "http://localhost:8000",
-        },
-    },
+        '^/api/.*': {
+            target: 'https://dns-manager-n39a.onrender.com',
+            changeOrigin: true,
+            secure: true,
+        }
+    }
 },
 })
