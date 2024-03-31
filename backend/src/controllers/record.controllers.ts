@@ -16,8 +16,8 @@ dotenv.config();
 const client = new Route53Client({
     region: "ap-south-1",
     credentials: {
-        accessKeyId: process.env.AWS_ACCESS_KEY as string,
-        secretAccessKey: process.env.AWS_ACCESS_SECRET as string,
+        accessKeyId: process.env.AMAZONE_ACCESS_KEY as string,
+        secretAccessKey: process.env.AMAZONE_ACCESS_SECRET as string,
     },
 });
 
@@ -31,7 +31,7 @@ const client = new Route53Client({
  * @returns ResourceRecordSets
  */
 const createRecord = asyncHandler(async (req: Request, res: Response) => {
-    const hosted_zone_id = process.env.AWS_HOSTED_ZONE_ID as string;
+    const hosted_zone_id = process.env.AMAZONE_HOSTED_ZONE_ID as string;
 
     console.log(req.body);
     
@@ -90,7 +90,7 @@ const fetchRecord = asyncHandler(async (req: Request, res: Response) => {
 
     try {
         const command = generateListRecordSetsCommand(
-            process.env.AWS_HOSTED_ZONE_ID as string
+            process.env.AMAZONE_HOSTED_ZONE_ID as string
         );
 
         const response = await client.send(command);
@@ -125,7 +125,7 @@ const fetchRecord = asyncHandler(async (req: Request, res: Response) => {
  */
 const updateRecord = asyncHandler(
     async (req: TypedRequest<RecordBody>, res: Response) => {
-        const hosted_zone_id = process.env.AWS_HOSTED_ZONE_ID as string;
+        const hosted_zone_id = process.env.AMAZONE_HOSTED_ZONE_ID as string;
         // extracting requesting body data
         const { Name } = req.body;
 
@@ -218,7 +218,7 @@ const updateRecord = asyncHandler(
  */
 const deleteRecord = asyncHandler(
     async (req: TypedRequest<RecordBody>, res: Response) => {
-        const hosted_zone_id = process.env.AWS_HOSTED_ZONE_ID as string;
+        const hosted_zone_id = process.env.AMAZONE_HOSTED_ZONE_ID as string;
 
         console.log(req.body);
         
