@@ -1,8 +1,8 @@
 {
   "rewrites": [
     {
-      "source": "/api/v1/:path*",
-      "destination": "https://dns-manager-n39a.onrender.com/:path*"
+      "source": "/api/:match*",
+      "destination": "https://dns-manager-n39a.onrender.com/:match*"
     }
   ]
 }
