@@ -5,10 +5,11 @@ import { ModalConst } from "../constants";
 import SignUp from "../components/SignUp";
 import { closeModal, toggleField } from "../app/slices/modalSlice";
 import { RxCross2 } from "react-icons/rx";
+import { AppStore } from "../@types";
 
 const Modal: FC = () => {
   const dispatch = useDispatch();
-  const { toggle, target } = useSelector((state: Store) => state.modal);
+  const { toggle, target } = useSelector((state: AppStore) => state.modal);
 
   const handleToggle = (e: any) => {
     if (e.target.name == ModalConst.SIGNIN) {

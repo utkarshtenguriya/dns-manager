@@ -3,9 +3,13 @@ export interface ModalInitialStateInfr {
   target: "SIGNIN" | "SIGNUP" | "";
 }
 
-export interface Store {
+export interface UserI {
+  email: string;
+  isLoggedIn: boolean;
+}
+export interface AppStore {
   modal: ModalInitialStateInfr;
-  records: RecordsInfr;
+  user: UserI;
 }
 
 export interface ModalConstI {
@@ -21,5 +25,5 @@ export interface DataInstanceInfr {
   TTL: number;
 }
 export interface RecordsInfr {
-  data: [DataInstanceInfr]
+  data: [DataInstanceInfr];
 }

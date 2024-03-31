@@ -187,7 +187,7 @@ const updateRecord = asyncHandler(
                 .json(
                     new ApiResponse(
                         200,
-                        { data },
+                        data,
                         "Resource updated successfully!"
                     )
                 );

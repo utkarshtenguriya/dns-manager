@@ -1,16 +1,30 @@
-import { FC } from "react";
-import ModalProvider from "../utils/ModalProvider";
-import Modal from "../templates/Modal";
+import { FC, useEffect } from "react";
+
 import { useDispatch, useSelector } from "react-redux";
 import { openModal } from "../app/slices/modalSlice";
 import { ModalConst } from "../constants";
+import { AppStore } from "../@types";
+import { useNavigate } from "react-router-dom";
+import { useVerify } from "../hooks/useVerify";
+import { setUserLoggedIn } from "../app/slices/userSlice";
 
 const Welcome: FC = () => {
   const dispatch = useDispatch()
-  const { toggle } = useSelector((state: Store) => state.modal);
+  const {isLoggedIn} = useSelector((state: AppStore) => state.user)
+  const navigate = useNavigate()
+  const user = useVerify()
+
+  useEffect(() => {
+    if (user) {
+      dispatch(setUserLoggedIn(user))
+    } 
+  }, [user])
 
   const handleClick = () => {
-    dispatch(openModal(ModalConst.SIGNUP))
+    if (!isLoggedIn)
+      dispatch(openModal(ModalConst.SIGNUP))
+    else
+      navigate("/dashboard")
   }
   return (
     <>
@@ -47,13 +61,7 @@ const Welcome: FC = () => {
           </div>
         </div>
       </div>
-      {toggle ? (
-        <ModalProvider>
-          <Modal />
-        </ModalProvider>
-      ) : (
-        <></>
-      )}
+      
     </>
   );
 };

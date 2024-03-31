@@ -1,12 +1,20 @@
-import { FC, useState, ChangeEventHandler } from "react";
+import { FC, useState, ChangeEventHandler, FormEventHandler } from "react";
 import FormInput from "../components/FormInput";
+import axios from "axios";
+import { useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { setUserLoggedIn } from "../app/slices/userSlice";
 
 const LogIn: FC = () => {
   const [input, setInput] = useState({
     email: "",
     password: "",
   });
+  const dispatch = useDispatch();
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
+  
   const handleInputChanged: ChangeEventHandler<HTMLInputElement> = ({
     target: { name, value },
   }) => {
@@ -14,9 +22,27 @@ const LogIn: FC = () => {
     console.log(input);
   };
 
+  const handleFormSubmit: FormEventHandler<HTMLFormElement> = async (e) => {
+    e.preventDefault()
+
+    setLoading(true)
+
+    const response = await axios.post("/api/v1/user/login", input).then(res => res.data);
+
+    if (!response) {
+      throw new Error("Login error")
+    }
+
+    console.log(response.payload.user.email);
+    
+    
+    dispatch(setUserLoggedIn({email: response.payload.user.email, isLoggedIn: true}))
+    navigate("/dashboard")
+  }
+
   return (
     <div>
-      <form onSubmit={() => {}}>
+      <form onSubmit={handleFormSubmit}>
         <div>
           <FormInput
             inputChangeHandler={handleInputChanged}
@@ -39,7 +65,7 @@ const LogIn: FC = () => {
         </div>
         <div className="flex justify-center">
           <button className="py-1 px-4 rounded-md bg-pink-700 text-white font-semibold my-4">
-            SignIn
+          {loading ? "Loading..." : "SignIn"}
           </button>
         </div>
       </form>

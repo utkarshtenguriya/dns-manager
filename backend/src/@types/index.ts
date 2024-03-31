@@ -43,6 +43,7 @@ export interface RecordBody {
 }
 
 export interface TypedRequest<T> {
+    user?: T;
     body: T;
     files?: File // optional:: for setting avater purpose
 }

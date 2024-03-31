@@ -61,7 +61,7 @@ export const registerUser = asyncHandler(
             throw new ApiError(500, "Failed, while creating user in DB.");
         }
 
-        // return res
+        // return successful response
         return res
             .status(201)
             .json(
@@ -120,3 +120,14 @@ export const loginUser = asyncHandler(
         )
     }
 );
+
+
+export const userAuth = asyncHandler(
+    async (req: TypedRequest<UserBody>, res: Response) => {
+        if (!req.user) {
+            throw new ApiError(400, "Failed authorization!")
+        }
+        return res.status(200).json(new ApiResponse(200, req.user))
+    }
+)
+
