@@ -10,7 +10,6 @@ import { LiaEditSolid } from "react-icons/lia";
 import { AiOutlineDelete } from "react-icons/ai";
 import axios from "axios";
 import { useDispatch } from "react-redux";
-import { storage } from "../storage/Store";
 import { FaSortAmountDownAlt, FaSortAmountUp } from "react-icons/fa";
 import { setUserLoggedIn } from "../app/slices/userSlice";
 import { genRecordId } from "../utils/genRecordId";
@@ -20,7 +19,7 @@ const Dashboard = () => {
   const [table, setTable] = useState<[DataInstanceInfr]>();
   const [search, setSearch] = useState("");
   const [sort, setSort] = useState<"UP" | "DOWN">("UP");
-  const [loading, setLoading] = useState(false);
+  // const [loading, setLoading] = useState(false);
   const dispatch = useDispatch();
   const user = useVerify();
   const [isUpdating, setIsUpdating] = useState(false);
@@ -42,53 +41,53 @@ const Dashboard = () => {
     TTL: 0,
   });
 
-  // useEffect(() => {
-  //   // ------------::Production::---------------//
-  //   //======================================//
-  //   if (user) {
-  //     dispatch(setUserLoggedIn(user));
-  //   }
-  //   (async () => {
-  //     setStatus("LOADING");
-  //     const response = await axios
-  //       .post("/api/v1/record/fetch")
-  //       .then((res) => res.data)
-  //       .catch((err) => err.response.status);
-
-  //     console.log(response);
-
-  //     if (response >= 400) {
-  //       return setStatus("FAILED");
-  //     }
-
-  //     const { payload } = response;
-
-  //     const data = genRecordId(payload);
-
-  //     setTable(data as [DataInstanceInfr]);
-
-  //     console.log(data);
-  //     setStatus("SUCCESS");
-  //   })();
-  // }, []);
-
   useEffect(() => {
+    // ------------::Production::---------------//
+    //======================================//
     if (user) {
       dispatch(setUserLoggedIn(user));
     }
+    (async () => {
+      setStatus("LOADING");
+      const response = await axios
+        .post("/api/v1/record/fetch")
+        .then((res) => res.data)
+        .catch((err) => err.response.status);
 
-    // ------------::Testing::---------------//
-    //======================================//
-    const data = genRecordId(storage as [DataInstanceInfr]);
+      console.log(response);
 
-    setTable(data as [DataInstanceInfr]);
+      if (response >= 400) {
+        return setStatus("FAILED");
+      }
 
-    console.log(data);
+      const { payload } = response;
 
-    if (table) {
-      setLoading(false);
-    }
-  }, [user]);
+      const data = genRecordId(payload);
+
+      setTable(data as [DataInstanceInfr]);
+
+      console.log(data);
+      setStatus("SUCCESS");
+    })();
+  }, []);
+
+  // ------------::Testing::---------------//
+  //======================================//
+  // useEffect(() => {
+  //   if (user) {
+  //     dispatch(setUserLoggedIn(user));
+  //   }
+
+  //   const data = genRecordId(storage as [DataInstanceInfr]);
+
+  //   setTable(data as [DataInstanceInfr]);
+
+  //   console.log(data);
+
+  //   if (table) {
+  //     setLoading(false);
+  //   }
+  // }, [user]);
 
   const handleInputChanged: ChangeEventHandler<
     HTMLInputElement | HTMLSelectElement
@@ -189,6 +188,7 @@ const Dashboard = () => {
   return (
     <div>
       <div>
+        {/* --------------Adding and Updating fields container--------------- */}
         <div className="mt-14 mb-10">
           <div>
             <div className="w-[80%] table-auto mx-auto grid grid-cols-4 py-4 px-4 shadow-sm border-2 border-slate-300 rounded-md">
@@ -281,6 +281,8 @@ const Dashboard = () => {
             </div>
           </div>
         </div>
+
+        {/* -------------::Additional features fields container such as searching, sorting, fitering etc.::--------------- */}
         <div className="flex justify-center my-2">
           <div className="my-2 flex space-x-4 w-[80%]">
             <input
@@ -319,6 +321,8 @@ const Dashboard = () => {
           </div>
         </div>
       </div>
+
+      {/* ------------::Record Table container::------------- */}
       <div>
         <div className="flex justify-center">
           <table className="w-[80%] mt-2 mb-24">
@@ -355,7 +359,7 @@ const Dashboard = () => {
               </tr>
             </thead>
             <tbody>
-              {table && !loading ? (
+              {table ? (
                 table
                   ?.filter((el) => {
                     return search === ""
