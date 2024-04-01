@@ -102,8 +102,9 @@ export const loginUser = asyncHandler(
 
         const options: CookieOptions = {
             httpOnly: true,
-            secure: true,
-            domain: "https://dns-manager-n39a.onrender.com"
+            secure: false,
+            domain: "https://dns-manager-n39a.onrender.com",
+            path: "/api"
         }
     
         return res
