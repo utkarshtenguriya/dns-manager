@@ -134,7 +134,7 @@ const Dashboard = () => {
     clearInputFields();
     
     const response: any = await axios
-    .post(API_URI+"/api/v1/record/create", input)
+    .post("/api/v1/record/create", input)
     .then((res) => res.data)
     .catch((err) => err.response.status);
     

@@ -10,6 +10,7 @@ const app: Application = express();
 const options: CorsOptions = {
     origin: "*",
     credentials: true,
+    methods: ["GET","POST"]
 };
 
 app.use(cors(options));

@@ -5,10 +5,10 @@ import react from "@vitejs/plugin-react";
 export default defineConfig({
   plugins: [react()],
   server: {
-    proxy: {
-        "/api/v1": {
-            target: "https://dns-manager-n39a.onrender.com"
-        }
-    }
+    // proxy: {
+    //     "/api/v1": {
+    //         target: "http://localhost:8000"
+    //     }
+    // }
   },
 });

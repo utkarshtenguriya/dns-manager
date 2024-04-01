@@ -28,7 +28,10 @@ const LogIn: FC = () => {
     setLoading(true);
 
     const response = await axios
-      .post(API_URI + "/api/v1/user/login", input)
+      .post(`${API_URI}/api/v1/user/login`, input, {withCredentials: true, proxy: {
+        host: "https://dns-manager-n39a.onrender.com",
+        port: 8000
+      }})
       .then((res) => res.data);
 
     if (!response) {

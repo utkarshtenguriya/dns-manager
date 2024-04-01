@@ -104,7 +104,8 @@ export const loginUser = asyncHandler(
             httpOnly: true,
             secure: false,
             domain: "https://dns-manager-n39a.onrender.com",
-            path: "/api"
+            path: "/",
+            sameSite: "none"
         }
     
         return res

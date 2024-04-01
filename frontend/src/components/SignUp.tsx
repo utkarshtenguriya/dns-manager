@@ -40,7 +40,7 @@ const SignUp: FC = () => {
       alert("Password mismatch!!!");
     } else {
       const response = await axios
-        .post(API_URI+"/api/v1/user/register", input)
+        .post("/api/v1/user/register", input)
         .then((res) => res.data);
 
       if (!response) {

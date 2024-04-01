@@ -13,7 +13,7 @@ export const useVerify = () => {
   useEffect(() => {
     (async () => {
       const response = await axios
-        .post(API_URI+"/api/v1/user/auth")
+        .post(`${API_URI}/api/v1/user/auth`,null)
         .then((res) => res.data).catch(err => err.response.status)
 
       console.log(response);
