@@ -8,7 +8,7 @@ const app: Application = express();
  * Configuration for cross origin requests 
  */
 const options: CorsOptions = {
-    origin: process.env.CORS_ORIGIN as string,
+    origin: "*",
     credentials: true,
 };
 
