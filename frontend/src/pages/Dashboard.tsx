@@ -14,7 +14,7 @@ import { FaSortAmountDownAlt, FaSortAmountUp } from "react-icons/fa";
 import { setUserLoggedIn } from "../app/slices/userSlice";
 import { genRecordId } from "../utils/genRecordId";
 import { useVerify } from "../hooks/useVerify";
-import { API_URI } from "../constants";
+import { API_URI, ProxyConfig } from "../constants";
 
 const Dashboard = () => {
   const [table, setTable] = useState<[DataInstanceInfr]>();
@@ -48,10 +48,12 @@ const Dashboard = () => {
     if (user) {
       dispatch(setUserLoggedIn(user));
     }
+
+    // fetch all records
     (async () => {
       setStatus("LOADING");
       const response = await axios
-        .post(API_URI+"/api/v1/record/fetch")
+        .post(API_URI+"/api/v1/record/fetch",null,ProxyConfig)
         .then((res) => res.data)
         .catch((err) => err.response.status);
 
@@ -70,7 +72,7 @@ const Dashboard = () => {
       console.log(data);
       setStatus("SUCCESS");
     })();
-  }, []);
+  }, [user]);
 
   // ------------::Testing::---------------//
   //======================================//
@@ -129,12 +131,13 @@ const Dashboard = () => {
     setSort("DOWN");
   };
 
+  // record createion handler
   const handleCreateRecord = async () => {
     setStatus("LOADING");
     clearInputFields();
     
     const response: any = await axios
-    .post("/api/v1/record/create", input)
+    .post(`${API_URI}/api/v1/record/create`, input,ProxyConfig)
     .then((res) => res.data)
     .catch((err) => err.response.status);
     
@@ -150,10 +153,11 @@ const Dashboard = () => {
     setStatus("SUCCESS");
   };
 
+  // record deletion handler
   const handleDeleteRecord = async (element: DataInstanceInfr) => {
     setStatus("LOADING");
     const response = await axios
-      .post(API_URI+"/api/v1/record/delete", element)
+      .post(`${API_URI}/api/v1/record/delete`, element, ProxyConfig)
       .then((res) => res.data)
       .catch((err) => err.response.status);
 
@@ -166,10 +170,11 @@ const Dashboard = () => {
     setStatus("SUCCESS");
   };
 
+  // record update handler
   const handleUpdateRecord = async () => {
     setStatus("LOADING");
     const response = await axios
-      .post(API_URI+"/api/v1/record/update", input)
+      .post(`${API_URI}/api/v1/record/update`, input,ProxyConfig)
       .then((res) => res.data)
       .catch((err) => err.response.status);
 

@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { closeModal } from "../app/slices/modalSlice";
-import { API_URI } from "../constants";
+import { API_URI, ProxyConfig } from "../constants";
 
 export const useVerify = () => {
   const [user, setUser] = useState<{ email: string; isLoggedIn: boolean }>();
@@ -13,7 +13,7 @@ export const useVerify = () => {
   useEffect(() => {
     (async () => {
       const response = await axios
-        .post(`${API_URI}/api/v1/user/auth`,null)
+        .post(`${API_URI}/api/v1/user/auth`,null, ProxyConfig)
         .then((res) => res.data).catch(err => err.response.status)
 
       console.log(response);

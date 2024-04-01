@@ -4,8 +4,8 @@ import axios from "axios";
 import { useDispatch } from "react-redux";
 import { closeModal } from "../app/slices/modalSlice";
 import { useNavigate } from "react-router-dom";
-import { setUserLoggedIn } from "../app/slices/userSlice";
-import { API_URI } from "../constants";
+// import { setUserLoggedIn } from "../app/slices/userSlice";
+import { API_URI, ProxyConfig } from "../constants";
 
 const SignUp: FC = () => {
   const dispatch = useDispatch();
@@ -40,7 +40,7 @@ const SignUp: FC = () => {
       alert("Password mismatch!!!");
     } else {
       const response = await axios
-        .post("/api/v1/user/register", input)
+        .post(`${API_URI}/api/v1/user/register`, input, ProxyConfig)
         .then((res) => res.data);
 
       if (!response) {
@@ -48,10 +48,10 @@ const SignUp: FC = () => {
       }
 
       console.log(response);
-      dispatch(setUserLoggedIn({ email: response.email, isLoggedIn: true }));
+      // dispatch(setUserLoggedIn({ email: response.email, isLoggedIn: true }));
       setLoading(false);
       dispatch(closeModal());
-      navigate("/dashboard");
+      navigate("/");
     }
   };
 

@@ -9,11 +9,12 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.userAuth = exports.loginUser = exports.registerUser = void 0;
+exports.logOutUser = exports.userAuth = exports.loginUser = exports.registerUser = void 0;
 const asyncHandler_1 = require("../utils/asyncHandler");
 const ApiError_1 = require("../utils/ApiError");
 const user_models_1 = require("../models/user.models");
 const ApiResponse_1 = require("../utils/ApiResponse");
+// -------------::refresh and access token generator::-----------------
 const generateAccessAndRefereshTokens = (userId) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const user = yield user_models_1.User.findById(userId);
@@ -74,23 +75,45 @@ exports.loginUser = (0, asyncHandler_1.asyncHandler)((req, res) => __awaiter(voi
     const loggedInUser = yield user_models_1.User.findById(user._id).select("-password -refreshToken");
     const options = {
         httpOnly: true,
-        secure: false,
-        domain: "https://dns-manager-n39a.onrender.com",
-        path: "/",
-        sameSite: "none"
+        secure: true,
+        sameSite: "none",
     };
     return res
         .status(200)
         .cookie("accessToken", accessToken, options)
         .cookie("refreshToken", refreshToken, options)
         .json(new ApiResponse_1.ApiResponse(200, {
-        user: loggedInUser, accessToken, refreshToken
+        user: loggedInUser,
+        accessToken,
+        refreshToken,
     }, "User logged In Successfully"));
 }));
+// ------------::user authentication controller::------------
 exports.userAuth = (0, asyncHandler_1.asyncHandler)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     if (!req.user) {
         throw new ApiError_1.ApiError(400, "Failed authorization!");
     }
     return res.status(200).json(new ApiResponse_1.ApiResponse(200, req.user));
+}));
+// ----------::user logout controller::--------------
+exports.logOutUser = (0, asyncHandler_1.asyncHandler)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
+    yield user_models_1.User.findByIdAndUpdate((_a = req.user) === null || _a === void 0 ? void 0 : _a._id, {
+        $unset: {
+            refreshToken: 1,
+        },
+    }, {
+        new: true,
+    });
+    const options = {
+        httpOnly: true,
+        secure: true,
+        sameSite: "none",
+    };
+    return res
+        .status(200)
+        .clearCookie("accessToken", options)
+        .clearCookie("refreshToken", options)
+        .json(new ApiResponse_1.ApiResponse(200, {}, "User successfully logged out!"));
 }));
 //# sourceMappingURL=user.controllers.js.map

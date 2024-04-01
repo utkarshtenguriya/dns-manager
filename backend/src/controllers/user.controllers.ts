@@ -1,27 +1,28 @@
-import { Request, Response, NextFunction, CookieOptions } from "express";
+import { Response, NextFunction, CookieOptions } from "express";
 import { asyncHandler } from "../utils/asyncHandler";
 import { TypedRequest, UserBody, LogInBody } from "../@types";
 import { ApiError } from "../utils/ApiError";
 import { User } from "../models/user.models";
 import { ApiResponse } from "../utils/ApiResponse";
 
-
-
-const generateAccessAndRefereshTokens = async(userId: string) => {
+// -------------::refresh and access token generator::-----------------
+const generateAccessAndRefereshTokens = async (userId: string) => {
     try {
-        const user:any = await User.findById(userId)
-        const accessToken = user.generateAccessToken()
-        const refreshToken = user.generateRefreshToken()
+        const user: any = await User.findById(userId);
+        const accessToken = user.generateAccessToken();
+        const refreshToken = user.generateRefreshToken();
 
-        user.refreshToken = refreshToken
-        await user.save({ validateBeforeSave: false })
+        user.refreshToken = refreshToken;
+        await user.save({ validateBeforeSave: false });
 
-        return {accessToken, refreshToken}
-
+        return { accessToken, refreshToken };
     } catch (error) {
-        throw new ApiError(500, "Something went wrong, can't generate refresh token and access token")
+        throw new ApiError(
+            500,
+            "Something went wrong, can't generate refresh token and access token"
+        );
     }
-}
+};
 
 // -------------defined user register or signup controller------------------
 export const registerUser = asyncHandler(
@@ -30,19 +31,14 @@ export const registerUser = asyncHandler(
         const { username, email, password } = req.body;
 
         // validation - not empty
-        if (
-            [ username, email, password].some(
-                (feild) => feild?.trim() === ""
-            )
-        ) {
+        if ([username, email, password].some((feild) => feild?.trim() === "")) {
             throw new ApiError(401, "Some fields are missing.");
         }
 
         // check if user already exists: userName, email
-        const existUser: any = await User.findOne({email});
+        const existUser: any = await User.findOne({ email });
 
         if (existUser) throw new ApiError(409, "User already exist.");
-
 
         // create user object - create entry in db
         const user = await User.create({
@@ -74,17 +70,16 @@ export const registerUser = asyncHandler(
     }
 );
 
-
 // ---------Login controller------------
 export const loginUser = asyncHandler(
     async (req: TypedRequest<LogInBody>, res: Response) => {
-        const {email, password} = req.body
+        const { email, password } = req.body;
 
         if (!email && !password) {
             throw new ApiError(400, "email and password are required");
         }
 
-        const user:any = await User.findOne({email})
+        const user: any = await User.findOne({ email });
 
         if (!user) {
             throw new ApiError(404, "User not exist");
@@ -96,39 +91,72 @@ export const loginUser = asyncHandler(
             throw new ApiError(401, "Invalid user credential");
         }
 
-        const {accessToken, refreshToken} = await generateAccessAndRefereshTokens(user._id);
+        const { accessToken, refreshToken } =
+            await generateAccessAndRefereshTokens(user._id);
 
-        const loggedInUser = await User.findById(user._id).select("-password -refreshToken")
+        const loggedInUser = await User.findById(user._id).select(
+            "-password -refreshToken"
+        );
 
         const options: CookieOptions = {
             httpOnly: true,
             secure: true,
-            sameSite: "none"
-        }
-    
+            sameSite: "none",
+        };
+
         return res
-        .status(200)
-        .cookie("accessToken", accessToken, options)
-        .cookie("refreshToken", refreshToken, options)
-        .json(
-            new ApiResponse(
-                200, 
-                {
-                    user: loggedInUser, accessToken, refreshToken
-                },
-                "User logged In Successfully"
-            )
-        )
+            .status(200)
+            .cookie("accessToken", accessToken, options)
+            .cookie("refreshToken", refreshToken, options)
+            .json(
+                new ApiResponse(
+                    200,
+                    {
+                        user: loggedInUser,
+                        accessToken,
+                        refreshToken,
+                    },
+                    "User logged In Successfully"
+                )
+            );
     }
 );
 
-
+// ------------::user authentication controller::------------
 export const userAuth = asyncHandler(
     async (req: TypedRequest<UserBody>, res: Response) => {
         if (!req.user) {
-            throw new ApiError(400, "Failed authorization!")
+            throw new ApiError(400, "Failed authorization!");
         }
-        return res.status(200).json(new ApiResponse(200, req.user))
+        return res.status(200).json(new ApiResponse(200, req.user));
     }
-)
+);
 
+// ----------::user logout controller::--------------
+export const logOutUser = asyncHandler(
+    async (req: TypedRequest<UserBody>, res: Response) => {
+        await User.findByIdAndUpdate(
+            req.user?._id,
+            {
+                $unset: {
+                    refreshToken: 1,
+                },
+            },
+            {
+                new: true,
+            }
+        );
+
+        const options: CookieOptions = {
+            httpOnly: true,
+            secure: true,
+            sameSite: "none",
+        };
+
+        return res
+            .status(200)
+            .clearCookie("accessToken", options)
+            .clearCookie("refreshToken", options)
+            .json(new ApiResponse(200, {}, "User successfully logged out!"));
+    }
+);
