@@ -5,6 +5,7 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   plugins: [react()],
   server: {
+<<<<<<< HEAD
     // proxy: {
     //     '^/api/.*': {
     //         target: 'https://dns-manager-n39a.onrender.com',
@@ -12,5 +13,14 @@ export default defineConfig({
     //         secure: true,
     //     }
     // }
+=======
+    proxy: {
+        '^/api/.*': {
+            target: 'https://dns-manager-n39a.onrender.com',
+            changeOrigin: true,
+            secure: false,
+        }
+    }
+>>>>>>> 95635779c305f5094ef9688f58503eda8ce6715d
 },
 })
