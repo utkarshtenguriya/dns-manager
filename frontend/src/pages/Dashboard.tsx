@@ -14,6 +14,7 @@ import { FaSortAmountDownAlt, FaSortAmountUp } from "react-icons/fa";
 import { setUserLoggedIn } from "../app/slices/userSlice";
 import { genRecordId } from "../utils/genRecordId";
 import { useVerify } from "../hooks/useVerify";
+import { API_URI } from "../constants";
 
 const Dashboard = () => {
   const [table, setTable] = useState<[DataInstanceInfr]>();
@@ -133,7 +134,7 @@ const Dashboard = () => {
     clearInputFields();
     
     const response: any = await axios
-    .post("/api/v1/record/create", input)
+    .post(API_URI+"/api/v1/record/create", input)
     .then((res) => res.data)
     .catch((err) => err.response.status);
     
@@ -152,7 +153,7 @@ const Dashboard = () => {
   const handleDeleteRecord = async (element: DataInstanceInfr) => {
     setStatus("LOADING");
     const response = await axios
-      .post("/api/v1/record/delete", element)
+      .post(API_URI+"/api/v1/record/delete", element)
       .then((res) => res.data)
       .catch((err) => err.response.status);
 
@@ -168,7 +169,7 @@ const Dashboard = () => {
   const handleUpdateRecord = async () => {
     setStatus("LOADING");
     const response = await axios
-      .post("/api/v1/record/update", input)
+      .post(API_URI+"/api/v1/record/update", input)
       .then((res) => res.data)
       .catch((err) => err.response.status);
 

@@ -8,6 +8,7 @@ import { Provider } from "react-redux";
 import { store } from "./app/store.ts";
 import ErrorPage from "./pages/ErrorPage.tsx";
 
+
 const routes = createBrowserRouter([
   {
     path: "/",

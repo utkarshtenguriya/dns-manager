@@ -4,6 +4,7 @@ import axios from "axios";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { setUserLoggedIn } from "../app/slices/userSlice";
+import { API_URI } from "../constants";
 
 const LogIn: FC = () => {
   const [input, setInput] = useState({
@@ -27,7 +28,7 @@ const LogIn: FC = () => {
 
     setLoading(true)
 
-    const response = await axios.post("/api/v1/user/login", input).then(res => res.data);
+    const response = await axios.post(API_URI+"/api/v1/user/login", input).then(res => res.data);
 
     if (!response) {
       throw new Error("Login error")
