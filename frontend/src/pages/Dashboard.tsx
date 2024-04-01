@@ -51,7 +51,7 @@ const Dashboard = () => {
     (async () => {
       setStatus("LOADING");
       const response = await axios
-        .post("/api/v1/record/fetch")
+        .post(API_URI+"/api/v1/record/fetch")
         .then((res) => res.data)
         .catch((err) => err.response.status);
 
