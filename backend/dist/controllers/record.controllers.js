@@ -67,7 +67,6 @@ exports.createRecord = createRecord;
  */
 const fetchRecord = (0, asyncHandler_1.asyncHandler)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     // extracting requesting body data
-    const { hosted_zone_id } = req.body;
     try {
         const command = (0, AwsCommands_1.generateListRecordSetsCommand)(process.env.AMAZONE_HOSTED_ZONE_ID);
         const response = yield client.send(command);

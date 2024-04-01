@@ -74,7 +74,10 @@ exports.loginUser = (0, asyncHandler_1.asyncHandler)((req, res) => __awaiter(voi
     const loggedInUser = yield user_models_1.User.findById(user._id).select("-password -refreshToken");
     const options = {
         httpOnly: true,
-        secure: true
+        secure: false,
+        domain: "https://dns-manager-n39a.onrender.com",
+        path: "/",
+        sameSite: "none"
     };
     return res
         .status(200)

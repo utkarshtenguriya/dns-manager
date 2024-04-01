@@ -13,8 +13,9 @@ exports.app = app;
  * Configuration for cross origin requests
  */
 const options = {
-    origin: process.env.CORS_ORIGIN,
+    origin: "*",
     credentials: true,
+    methods: ["GET", "POST"]
 };
 app.use((0, cors_1.default)(options));
 app.use(express_1.default.json({ limit: "16kb" }));

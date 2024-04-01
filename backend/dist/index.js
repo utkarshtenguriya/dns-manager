@@ -8,7 +8,6 @@ const app_1 = require("./app");
 const dotenv_1 = __importDefault(require("dotenv"));
 const path_1 = __importDefault(require("path"));
 dotenv_1.default.config({ path: path_1.default.join(__dirname, "..", ".env") });
-app_1.app.get("/", (req, res) => res.send("<h2 style='color: green'>Express on Vercel</h2>"));
 (0, database_1.default)()
     .then(() => {
     app_1.app.listen(process.env.PORT || 8080, () => {
