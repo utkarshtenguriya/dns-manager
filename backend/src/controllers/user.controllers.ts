@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from "express";
+import { Request, Response, NextFunction, CookieOptions } from "express";
 import { asyncHandler } from "../utils/asyncHandler";
 import { TypedRequest, UserBody, LogInBody } from "../@types";
 import { ApiError } from "../utils/ApiError";
@@ -100,9 +100,10 @@ export const loginUser = asyncHandler(
 
         const loggedInUser = await User.findById(user._id).select("-password -refreshToken")
 
-        const options = {
+        const options: CookieOptions = {
             httpOnly: true,
-            secure: true
+            secure: true,
+            domain: "https://dns-manager-n39a.onrender.com"
         }
     
         return res

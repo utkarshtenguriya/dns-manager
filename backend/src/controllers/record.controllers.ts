@@ -86,7 +86,6 @@ const createRecord = asyncHandler(async (req: Request, res: Response) => {
  */
 const fetchRecord = asyncHandler(async (req: Request, res: Response) => {
     // extracting requesting body data
-    const { hosted_zone_id } = req.body;
 
     try {
         const command = generateListRecordSetsCommand(
